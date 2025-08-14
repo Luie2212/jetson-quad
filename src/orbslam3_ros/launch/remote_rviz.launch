@@ -1,3 +1,0 @@
-<launch>
-    <node type="rviz" name="rviz" pkg="rviz" args="-d $(find orbslam3-ros)/rviz/orbslam.rviz" />
-</launch>

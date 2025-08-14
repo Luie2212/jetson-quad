@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(orbslam3_ros)
+project(usbcam_controller)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,23 +8,8 @@ project(orbslam3_ros)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-    roscpp
-    rospy
-    catkin_virtualenv
-    std_msgs
-    sensor_msgs
-    geometry_msgs
-    visualization_msgs
-    message_generation
-    tf
-    tf2
-    cv_bridge
+  rospy
 )
-
-find_package(OpenCV 4.1 REQUIRED)
-find_package(Eigen3 3.1.0 REQUIRED)
-find_package(Pangolin REQUIRED)
-find_package(PCL 1.7 REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -34,9 +19,6 @@ find_package(PCL 1.7 REQUIRED)
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 # catkin_python_setup()
-catkin_generate_virtualenv(
-    PYTHON_INTERPRETER python3.6
-)
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -68,10 +50,6 @@ catkin_generate_virtualenv(
 #   Message1.msg
 #   Message2.msg
 # )
-add_message_files(
-   FILES
-   SLAMTime.msg
-)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -92,10 +70,6 @@ add_message_files(
 #   DEPENDENCIES
 #   std_msgs  # Or other packages containing msgs
 # )
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -127,9 +101,9 @@ generate_messages(
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-# INCLUDE_DIRS include
-#  LIBRARIES orbslam3-ros
-  CATKIN_DEPENDS roscpp message_runtime
+#  INCLUDE_DIRS include
+#  LIBRARIES usbcam_controller
+#  CATKIN_DEPENDS rospy
 #  DEPENDS system_lib
 )
 
@@ -140,22 +114,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
-  include
-  ORB_SLAM3
-  ORB_SLAM3/include
-  ORB_SLAM3/include/CameraModels
-  ORB_SLAM3/Thirdparty/Sophus
-  Thirdparty/DBoW2/DBoW2
+# include
   ${catkin_INCLUDE_DIRS}
-  ${Pangolin_INCLUDE_DIRS}
-  ${PCL_INCLUDE_DIRS}
-  ${catkin_INCLUDE_DIRS}
-  ${OCTOMAP_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/orbslam3-ros.cpp
+#   src/${PROJECT_NAME}/usbcam_controller.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -166,11 +131,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/orbslam3-ros_node.cpp)
-add_executable(${PROJECT_NAME}_node_mono src/ros_mono.cc)
-add_executable(${PROJECT_NAME}_node src/ros_rgbd.cc)
-add_executable(${PROJECT_NAME}_nodei src/ros_rgbdi.cc)
-add_executable(${PROJECT_NAME}_tf_test src/tf_test.cc)
+# add_executable(${PROJECT_NAME}_node src/usbcam_controller_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -183,46 +144,9 @@ add_executable(${PROJECT_NAME}_tf_test src/tf_test.cc)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_node_mono
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBS} 
-  ${EIGEN3_LIBS}
-  ${Pangolin_LIBRARIES}
-  ${PCL_LIBRARIES}
-  ${OCTOMAP_LIBRARIES}
-  ${PROJECT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/DBoW2/lib/libDBoW2.so
-  ${PROJECT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/g2o/lib/libg2o.so
-  ${PROJECT_SOURCE_DIR}/ORB_SLAM3/lib/libORB_SLAM3.so
-  -lboost_system
-)
-target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBS} 
-  ${EIGEN3_LIBS}
-  ${Pangolin_LIBRARIES}
-  ${PCL_LIBRARIES}
-  ${OCTOMAP_LIBRARIES}
-  ${PROJECT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/DBoW2/lib/libDBoW2.so
-  ${PROJECT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/g2o/lib/libg2o.so
-  ${PROJECT_SOURCE_DIR}/ORB_SLAM3/lib/libORB_SLAM3.so
-  -lboost_system
-)
-target_link_libraries(${PROJECT_NAME}_nodei
-  ${catkin_LIBRARIES}
-  ${OpenCV_LIBS} 
-  ${EIGEN3_LIBS}
-  ${Pangolin_LIBRARIES}
-  ${PCL_LIBRARIES}
-  ${OCTOMAP_LIBRARIES}
-  ${PROJECT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/DBoW2/lib/libDBoW2.so
-  ${PROJECT_SOURCE_DIR}/ORB_SLAM3/Thirdparty/g2o/lib/libg2o.so
-  ${PROJECT_SOURCE_DIR}/ORB_SLAM3/lib/libORB_SLAM3.so
-  -lboost_system
-)
-
-target_link_libraries(${PROJECT_NAME}_tf_test
-  ${catkin_LIBRARIES}
-)
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
+# )
 
 #############
 ## Install ##
@@ -233,10 +157,10 @@ target_link_libraries(${PROJECT_NAME}_tf_test
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-catkin_install_python(PROGRAMS
-  scripts/track_orbslam.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+# catkin_install_python(PROGRAMS
+#   scripts/my_python_script
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
@@ -260,17 +184,18 @@ catkin_install_python(PROGRAMS
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(FILES
-  requirements.txt
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+# install(FILES
+#   # myfile1
+#   # myfile2
+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# )
 
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_orbslam3-ros.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_usbcam_controller.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

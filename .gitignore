@@ -1,6 +1,9 @@
 # vscode
 .vscode
 
+# photos
+Photos/
+
 # ROS
 .catkin_tools
 devel/

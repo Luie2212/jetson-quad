@@ -5,8 +5,7 @@ Python3 setup with catkin_virtualenv
 
 import rospy
 import numpy as np
-import pygame
-import pygame.camera
+import cv2
 
 if __name__ == '__main__':
     rospy.init_node("camera_loop_node")
@@ -16,31 +15,40 @@ if __name__ == '__main__':
     while not prevTime:
         prevTime = rospy.Time.now()
     
-    # link camera
-    pygame.camera.init()
-    cameras_found = len(pygame.camera.list_cameras())
-    if cameras_found == 0: #Camera detected or not
-        rospy.logerr("Camera list is empty! Exiting...")
+    # # link camera
+    
+    # define resolution
+    resCap = (2592, 1944)
+    resWrite = resCap
+
+    #open device and set capture resolution
+    cap = cv2.VideoCapture("/dev/video0")
+    cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+    cap.set( cv2.CAP_PROP_FRAME_WIDTH, resCap[0])
+    cap.set( cv2.CAP_PROP_FRAME_HEIGHT, resCap[1])
+
+    if not cap.isOpened():
+        rospy.logerr("Error: Could not open camera.")
         exit()
-    rospy.loginfo(f"Cameras found: {cameras_found}")
-    cam = pygame.camera.Camera("/dev/video0",(1920,1080))
-    cam.start()
+    
     image_num=0
 
     # code below to loop
-    rate = rospy.Rate(1) # rate to take a photo per second. Limit is ~5fps thorugh single image capture with the following implementation
+    rate = rospy.Rate(1) # rate to take a photo per second. Limit is ~20fps thorugh single image capture with the following implementation
     while not rospy.is_shutdown():
         
         # take screenshot:
         rospy.loginfo("Getting image...")
-        while not cam.query_image():
-            rospy.loginfo("Waiting for cam to be ready...")
+        ret, frame = cap.read()
+        if ret:
+            # Save the captured photo
+            filename = f'image_{image_num:04x}.jpg'
+            cv2.imwrite(f"/home/jetson/jetson-quad/Photos/{filename}", frame)
+            rospy.loginfo(f"Saved Image as {filename}")
+        else:
+            rospy.loginfo("Failed to capture photo.")
             rospy.sleep(1)
-        img = cam.get_image()
-        rospy.loginfo("...Image recieved. Saving Image...")
-        filename = f'image_{image_num:04x}.jpg'
-        pygame.image.save(img,f"/home/jetson/jetson-quad/Photos/{filename}")
-        rospy.loginfo(f"Saved Image as {filename}")
+            
 
         image_num += 1
 
@@ -51,4 +59,6 @@ if __name__ == '__main__':
         
         rate.sleep()
     
-    cam.stop()
+    # cam.stop()
+    cap.release()
+    cv2.destroyAllWindows()

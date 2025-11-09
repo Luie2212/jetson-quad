@@ -34,7 +34,7 @@ if __name__ == '__main__':
     image_num=0
 
     # code below to loop
-    rate = rospy.Rate(1) # rate to take a photo per second. Limit is ~20fps thorugh single image capture with the following implementation
+    rate = rospy.Rate(30) # rate to take a photo per second. Limit is ~20fps thorugh single image capture with the following implementation
     while not rospy.is_shutdown():
         
         # take screenshot:
